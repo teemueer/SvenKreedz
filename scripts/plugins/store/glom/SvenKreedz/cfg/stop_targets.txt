@@ -1,0 +1,6 @@
+counter_stop
+counter_off
+counter_stop_button
+stopcounter
+stop_counter
+clockstop

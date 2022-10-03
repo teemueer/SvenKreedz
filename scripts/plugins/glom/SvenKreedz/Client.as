@@ -72,6 +72,11 @@ namespace SKZClient
       get const { return m_bMenuOpen; }
       set { m_bMenuOpen = value; }
     }
+
+    bool IsBot
+    {
+      get const { return this.Player.pev.flags & FL_FAKECLIENT != 0; }
+    }
     
     SKZStopwatch::Stopwatch@ Stopwatch
     {
@@ -196,12 +201,15 @@ namespace SKZClient
       this.Stopwatch.Cancel(@this.Player, uiStopTime - m_uiStartTime);
     }
 
-    void Respawn()
+    void Respawn(const bool bIsBot = false)
     {
       if (DEBUG) g_Game.AlertMessage(at_console, "[%1] Respawn()\n", this.Name);
 
       this.Cancel();
       g_PlayerFuncs.RespawnPlayer(@this.Player, true, true);
+
+      if (bIsBot)
+        this.Player.pev.origin = Vector(99999, 99999, 99999);
     }
 
     void Save()

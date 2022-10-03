@@ -21,6 +21,7 @@ const string PLUGIN_CONTACT = "https://glom.iki.fi/kz";
 #include "entities/TriggerTimer"
 #include "entities/FuncTimer"
 
+#include "utils/Bot"
 #include "utils/Config"
 #include "utils/File"
 #include "utils/Misc"
@@ -98,10 +99,12 @@ void MapActivate()
 
 void MainLoop()
 {
+  uint uiPlayersAlive = 0;
+
   for (int i = 1; i <= g_Engine.maxClients; ++i)
   {
     CBasePlayer@ pPlayer = g_PlayerFuncs.FindPlayerByIndex(i);
-    if (pPlayer is null || !pPlayer.IsConnected())
+    if (pPlayer is null || !pPlayer.IsConnected() || pPlayer.pev.flags & FL_FAKECLIENT != 0)
       continue;
 
     SKZClient::Client @pClient = SKZClient::GetClient(@pPlayer);
@@ -114,7 +117,11 @@ void MainLoop()
 
     Observer@ pObserver = pPlayer.GetObserver();
     if (!pObserver.IsObserver())
+    {
+      if (pPlayer.IsAlive())
+        uiPlayersAlive++;
       continue;
+    }
 
     CBaseEntity@ pTargetEntity = pObserver.GetObserverTarget();
     if (pTargetEntity is null || !pTargetEntity.IsPlayer()) {
@@ -128,5 +135,13 @@ void MainLoop()
 
     if (pClient.TargetStopwatch is null || pClient.TargetStopwatch != pTarget.Stopwatch)
       g_Scheduler.SetTimeout(@pClient, "SetTarget", 0.05f, @pTarget);
+  }
+
+  if (g_SurvivalMode.IsActive())
+  {
+    if (!SKZBot::g_bBotInGame && uiPlayersAlive == 0)
+      SKZBot::Create("Snipper");
+    else if (SKZBot::g_bBotInGame && uiPlayersAlive > 0)
+      SKZBot::KickAll();
   }
 }

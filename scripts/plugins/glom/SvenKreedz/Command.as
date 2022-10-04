@@ -22,7 +22,7 @@ namespace SKZCommand
 
   dictionary g_Commands = {
     {CMD_RESPAWN,       array<string> = {"respawn", "start"}},
-    {CMD_PRO,           array<string> = {"pro"}},
+    {CMD_PRO,           array<string> = {"pro", "top15"}},
     {CMD_NUB,           array<string> = {"nub"}},
     {CMD_CP,            array<string> = {"cp"}},
     {CMD_TP,            array<string> = {"tp"}},
@@ -53,6 +53,7 @@ namespace SKZCommand
   CClientCommand@ g_pCp         = CClientCommand("cp",        "Save a checkpoint",    @Console);
   CClientCommand@ g_pTp         = CClientCommand("tp",        "Load a checkpoint",    @Console);
   CClientCommand@ g_pPro        = CClientCommand("pro",       "Print pro climbers",   @Console);
+  CClientCommand@ g_pTop15      = CClientCommand("top15",     "Print pro climbers",   @Console);
   CClientCommand@ g_pNub        = CClientCommand("nub",       "Print nub climbers",   @Console);
   CClientCommand@ g_pRewpawn    = CClientCommand("respawn",   "Respawn",              @Console);
   CClientCommand@ g_pStart      = CClientCommand("start",     "Respawn",              @Console);

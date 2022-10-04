@@ -249,6 +249,9 @@ namespace SKZClient
 
       g_PlayerFuncs.RespawnPlayer(@pPlayer, true, true);
 
+      pPlayer.RemoveAllItems(false);
+      pPlayer.GiveNamedItem("weapon_crowbar");
+
       if (bIsBot)
         pPlayer.pev.origin = Vector(99999, 99999, 99999);
     }

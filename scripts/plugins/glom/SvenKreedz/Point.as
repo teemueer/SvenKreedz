@@ -81,7 +81,7 @@ namespace SKZPoint
 
       int iIndex = g_CurrentMapPoints.find(@pPoint);
       if (iIndex >= 0)
-        pPoint.Points - g_CurrentMapPoints[iIndex].Points;
+        pPoint.Points -= g_CurrentMapPoints[iIndex].Points;
 
       g_OtherMapPoints.insertLast(@pPoint);
     }

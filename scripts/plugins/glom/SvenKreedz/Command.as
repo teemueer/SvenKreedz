@@ -33,20 +33,21 @@ namespace SKZCommand
     {CMD_REMOVE_START,  array<string> = {"remove_start"}},
     {CMD_CREATE_STOP,   array<string> = {"create_stop"}},
     {CMD_REMOVE_STOP,   array<string> = {"remove_stop"}},
-    {CMD_SAVE_BUTTONS,  array<string> = {"save_buttons"}}
+    {CMD_START,         array<string> = {"save_buttons"}},
+    {CMD_STOP,          array<string> = {"save_buttons"}}
   };
 
   CCVar@ g_pLadderBoost = CCVar("mp_ladder_boost", 1.5f, "Ladder boost value", ConCommandFlag::AdminOnly);
   CClientCommand@ g_pLadderBoostCommand = CClientCommand("ladder_boost", "Ladder boost", @LadderBoost);
 
-  CClientCommand@ g_pStartTimer   = CClientCommand("start_timer",   "Start timer",  @AdminConsole);
-  CClientCommand@ g_pStopTimer    = CClientCommand("stop_timer",    "Stop timer",   @AdminConsole);
-  CClientCommand@ g_pCancelTimer  = CClientCommand("cancel_timer",  "Cancel timer", @AdminConsole);
-  CClientCommand@ g_pCreateStart  = CClientCommand("create_start",  "Create start", @AdminConsole);
-  CClientCommand@ g_pRemoveStart  = CClientCommand("remove_start",  "Remove start", @AdminConsole);
-  CClientCommand@ g_pCreateStop   = CClientCommand("create_stop",   "Create stop",  @AdminConsole);
-  CClientCommand@ g_pRemoveStop   = CClientCommand("remove_stop",   "Remove stop",  @AdminConsole);
-  CClientCommand@ g_pSaveButtons  = CClientCommand("save_buttons",  "Save buttons", @AdminConsole);
+  CClientCommand@ g_pStartTimer   = CClientCommand("start_timer",   "Start timer",  @Console, ConCommandFlag::AdminOnly);
+  CClientCommand@ g_pStopTimer    = CClientCommand("stop_timer",    "Stop timer",   @Console, ConCommandFlag::AdminOnly);
+  CClientCommand@ g_pCancelTimer  = CClientCommand("cancel_timer",  "Cancel timer", @Console, ConCommandFlag::AdminOnly);
+  CClientCommand@ g_pCreateStart  = CClientCommand("create_start",  "Create start", @Console, ConCommandFlag::AdminOnly);
+  CClientCommand@ g_pRemoveStart  = CClientCommand("remove_start",  "Remove start", @Console, ConCommandFlag::AdminOnly);
+  CClientCommand@ g_pCreateStop   = CClientCommand("create_stop",   "Create stop",  @Console, ConCommandFlag::AdminOnly);
+  CClientCommand@ g_pRemoveStop   = CClientCommand("remove_stop",   "Remove stop",  @Console, ConCommandFlag::AdminOnly);
+  CClientCommand@ g_pSaveButtons  = CClientCommand("save_buttons",  "Save buttons", @Console, ConCommandFlag::AdminOnly);
 
   CClientCommand@ g_pMenu       = CClientCommand("menu",      "Toggle menu",          @Console);
   CClientCommand@ g_pCp         = CClientCommand("cp",        "Save a checkpoint",    @Console);
@@ -85,16 +86,21 @@ namespace SKZCommand
 
       SKZClient::Client@ pClient = SKZClient::GetClient(@pPlayer);
 
+      bool bAdmin = g_PlayerFuncs.AdminLevel(@pPlayer) >= ADMIN_YES;
+
       switch (uiKey)
       {
         case CMD_START:
-          pClient.Start();
+          if (bAdmin)
+            pClient.Start();
           break;
         case CMD_STOP:
-          pClient.Stop();
+          if (bAdmin)
+            pClient.Stop();
           break;
         case CMD_CANCEL:
-          pClient.Cancel();
+          if (bAdmin)
+            pClient.Cancel();
           break;
         case CMD_RESPAWN:
           pClient.Respawn();
@@ -121,19 +127,24 @@ namespace SKZCommand
           pClient.GiveWeapon();
           break;
         case CMD_CREATE_START:
-          SKZEntity::CreateButton(@pClient.Player, SKZEntity::TIMER_START);
+          if (bAdmin)
+            SKZEntity::CreateButton(@pClient.Player, SKZEntity::TIMER_START);
           break;
         case CMD_REMOVE_START:
-          SKZEntity::RemoveButton(SKZEntity::TIMER_START);
+          if (bAdmin)
+            SKZEntity::RemoveButton(SKZEntity::TIMER_START);
           break;
         case CMD_CREATE_STOP:
-          SKZEntity::CreateButton(@pClient.Player, SKZEntity::TIMER_STOP);
+          if (bAdmin)
+            SKZEntity::CreateButton(@pClient.Player, SKZEntity::TIMER_STOP);
           break;
         case CMD_REMOVE_STOP:
-          SKZEntity::RemoveButton(SKZEntity::TIMER_STOP);
+          if (bAdmin)
+            SKZEntity::RemoveButton(SKZEntity::TIMER_STOP);
           break;
         case CMD_SAVE_BUTTONS:
-          SKZEntity::SaveButtons();
+          if (bAdmin)
+            SKZEntity::SaveButtons();
           break;
       }
 
@@ -151,31 +162,13 @@ namespace SKZCommand
       Execute(@pPlayer, pArguments[0]);
   }
 
-  void AdminConsole(const CCommand@ pArguments)
-  {
-    CBasePlayer@ pPlayer = g_ConCommandSystem.GetCurrentPlayer();
-
-    bool bAdmin = g_PlayerFuncs.AdminLevel(@pPlayer) >= ADMIN_YES;
-    if (!bAdmin)
-    {
-      SKZPrint::Notify(@pPlayer, "You need to be an admin to use this command.");
-      return;
-    }
-
-    if (pArguments.ArgC() == 1)
-      Execute(@pPlayer, pArguments[0]);
-  }
-
   void LadderBoost(const CCommand@ pArguments)
   {
     CBasePlayer@ pPlayer = g_ConCommandSystem.GetCurrentPlayer();
 
     bool bAdmin = g_PlayerFuncs.AdminLevel(@pPlayer) >= ADMIN_YES;
     if (!bAdmin)
-    {
-      SKZPrint::Notify(@pPlayer, "You need to be an admin to use this command.");
       return;
-    }
 
     if (pArguments.ArgC() > 1)
     {

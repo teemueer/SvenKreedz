@@ -33,8 +33,8 @@ namespace SKZCommand
     {CMD_REMOVE_START,  array<string> = {"remove_start"}},
     {CMD_CREATE_STOP,   array<string> = {"create_stop"}},
     {CMD_REMOVE_STOP,   array<string> = {"remove_stop"}},
-    {CMD_START,         array<string> = {"save_buttons"}},
-    {CMD_STOP,          array<string> = {"save_buttons"}}
+    {CMD_START,         array<string> = {"start_timer"}},
+    {CMD_STOP,          array<string> = {"stop_timer"}}
   };
 
   CCVar@ g_pLadderBoost = CCVar("mp_ladder_boost", 1.5f, "Ladder boost value", ConCommandFlag::AdminOnly);

@@ -29,6 +29,12 @@ namespace SKZPoint
       this.Points = uiPoints;
     }
 
+    Point(Point@ pPoint)
+    {
+      this.SteamId = pPoint.SteamId;
+      this.Points = pPoint.Points;
+    }
+
     bool opEquals(Point@ pPoint)
     {
       return this.SteamId == pPoint.SteamId;
@@ -92,7 +98,10 @@ namespace SKZPoint
     array<Point@> points;
 
     for (uint i = 0; i < g_OtherMapPoints.length(); ++i)
-      points.insertLast(g_OtherMapPoints[i]);
+    {
+      Point@ pPoint = Point(g_OtherMapPoints[i]);
+      points.insertLast(@pPoint);
+    }
 
     for (uint i = 0; i < g_CurrentMapPoints.length(); ++i)
     {

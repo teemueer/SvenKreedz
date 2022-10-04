@@ -102,6 +102,7 @@ void MapActivate()
 void MainLoop()
 {
   uint uiPlayersAlive = 0;
+  bool bPlayersOnline = false;
 
   for (int i = 1; i <= g_Engine.maxClients; ++i)
   {
@@ -110,6 +111,7 @@ void MainLoop()
       continue;
 
     SKZClient::Client @pClient = SKZClient::GetClient(@pPlayer);
+    bPlayersOnline = true;
 
     if (pClient.Stopwatch.Started && (pPlayer.pev.movetype == MOVETYPE_NOCLIP || pPlayer.pev.flags & FL_GODMODE != 0 || pPlayer.pev.iuser4 == 69))
     {
@@ -141,9 +143,12 @@ void MainLoop()
 
   if (g_SurvivalMode.IsActive())
   {
-    if (!SKZBot::g_bBotInGame && uiPlayersAlive == 0)
+    if (SKZBot::g_bBotInGame)
+    {
+      if (!bPlayersOnline || uiPlayersAlive > 0)
+        SKZBot::KickAll();
+    }
+    else if (bPlayersOnline && uiPlayersAlive == 0)
       SKZBot::Create("Snipper");
-    else if (SKZBot::g_bBotInGame && uiPlayersAlive > 0)
-      SKZBot::KickAll();
   }
 }

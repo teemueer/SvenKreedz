@@ -17,7 +17,7 @@ namespace ClientHooks
       if (SKZCommand::Execute(pPlayer, pArguments[0]))
       {
         pParams.ShouldHide = true;
-        return HOOK_CONTINUE;
+        return HOOK_HANDLED;
       }
     }
     return HOOK_CONTINUE;

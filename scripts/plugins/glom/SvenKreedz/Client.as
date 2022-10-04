@@ -249,8 +249,8 @@ namespace SKZClient
 
       g_PlayerFuncs.RespawnPlayer(@pPlayer, true, true);
 
-      if (bIsBot)
-        pPlayer.pev.origin = Vector(99999, 99999, 99999);
+      //if (bIsBot)
+      //  pPlayer.pev.origin = Vector(99999, 99999, 99999);
     }
 
     void Save()

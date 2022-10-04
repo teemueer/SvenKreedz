@@ -5,6 +5,9 @@ namespace PlayerHooks
 
   HookReturnCode Spawn(CBasePlayer@ pPlayer)
   {
+    pPlayer.RemoveAllItems(false);
+    pPlayer.GiveNamedItem("weapon_crowbar");
+
     SKZClient::Client@ pClient = SKZClient::GetClient(@pPlayer);
     pClient.RemoveTarget();
     pClient.CreateSemiclip();

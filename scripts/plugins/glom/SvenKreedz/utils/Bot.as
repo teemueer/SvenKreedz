@@ -18,7 +18,11 @@ namespace SKZBot
     {
       SKZClient::Client@ pClient = SKZClient::g_Clients[i];
       if (pClient !is null && pClient.IsBot)
-        g_AdminControl.KickPlayer(@pClient.Player);
+      {
+        CBasePlayer@ pPlayer = @pClient.Player;
+        if (pPlayer !is null)
+          g_AdminControl.KickPlayer(@pPlayer);
+      }
     }
     g_bBotInGame = false;
   }

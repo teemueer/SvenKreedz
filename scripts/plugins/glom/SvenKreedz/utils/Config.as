@@ -6,7 +6,7 @@ namespace SKZConfig
   const string szStartTargets = szCfg + "start_targets.txt";
   const string szStopTargets = szCfg + "stop_targets.txt";
 
-  const string szRecords = szStore + (!DEBUG ? "test_records/" : "records/");
+  const string szRecords = szStore + (DEBUG ? "test_records/" : "records/");
 
   const string szPoints = szStore + "points.txt";
 

@@ -131,7 +131,9 @@ namespace SKZPoint
     iIndex = g_CurrentMapPoints.find(Point(szSteamId, 0));
     uiFrags += iIndex >= 0 ? g_CurrentMapPoints[iIndex].Points : 0;
 
-    pClient.Player.pev.frags = uiFrags;
+    CBasePlayer@ pPlayer = pClient.Player;
+    if (pPlayer !is null)
+      pClient.Player.pev.frags = uiFrags;
   }
 
   void UpdateFrags()

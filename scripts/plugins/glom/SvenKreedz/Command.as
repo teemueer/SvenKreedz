@@ -12,36 +12,56 @@ namespace SKZCommand
     CMD_TP,
     CMD_OBSERVER,
     CMD_MENU,
-    CMD_WEAPON
+    CMD_WEAPON,
+    CMD_CREATE_START,
+    CMD_REMOVE_START,
+    CMD_CREATE_STOP,
+    CMD_REMOVE_STOP,
+    CMD_SAVE_BUTTONS
   }
 
   dictionary g_Commands = {
-    {CMD_START,     array<string> = {"t_start"}},
-    {CMD_STOP,      array<string> = {"t_stop"}},
-    {CMD_CANCEL,    array<string> = {"t_cancel"}},
-    {CMD_RESPAWN,   array<string> = {"respawn"}},
-    {CMD_PRO,       array<string> = {"pro"}},
-    {CMD_NUB,       array<string> = {"nub"}},
-    {CMD_CP,        array<string> = {"cp"}},
-    {CMD_TP,        array<string> = {"tp"}},
-    {CMD_OBSERVER,  array<string> = {"observer"}},
-    {CMD_MENU,      array<string> = {"menu"}},
-    {CMD_WEAPON,    array<string> = {"weapon"}}
+    {CMD_RESPAWN,       array<string> = {"respawn", "start"}},
+    {CMD_PRO,           array<string> = {"pro"}},
+    {CMD_NUB,           array<string> = {"nub"}},
+    {CMD_CP,            array<string> = {"cp"}},
+    {CMD_TP,            array<string> = {"tp"}},
+    {CMD_OBSERVER,      array<string> = {"observer", "observe", "spectate", "spectator", "spec", "obs"}},
+    {CMD_MENU,          array<string> = {"menu"}},
+    {CMD_WEAPON,        array<string> = {"weapon"}},
+    {CMD_CREATE_START,  array<string> = {"create_start"}},
+    {CMD_REMOVE_START,  array<string> = {"remove_start"}},
+    {CMD_CREATE_STOP,   array<string> = {"create_stop"}},
+    {CMD_REMOVE_STOP,   array<string> = {"remove_stop"}},
+    {CMD_SAVE_BUTTONS,  array<string> = {"save_buttons"}}
   };
 
-  CCVar@ g_pLadderBoost = CCVar("ladder_boost", 1.5f, "Ladder boost value", ConCommandFlag::AdminOnly);
+  CCVar@ g_pLadderBoost = CCVar("mp_ladder_boost", 1.5f, "Ladder boost value", ConCommandFlag::AdminOnly);
+  CClientCommand@ g_pLadderBoostCommand = CClientCommand("ladder_boost", "Ladder boost", @LadderBoost);
 
-  CClientCommand@ g_pStart    = CClientCommand("t_start",   "Start timer",          @Console, ConCommandFlag::AdminOnly);
-  CClientCommand@ g_pStop     = CClientCommand("t_stop",    "Stop timer",           @Console, ConCommandFlag::AdminOnly);
-  CClientCommand@ g_pCancel   = CClientCommand("t_cancel",  "Stop timer",           @Console, ConCommandFlag::AdminOnly);
-  CClientCommand@ g_pRewpawn  = CClientCommand("respawn",   "Respawn",              @Console);
-  CClientCommand@ g_pPro      = CClientCommand("pro",       "Print pro climbers",   @Console);
-  CClientCommand@ g_pNub      = CClientCommand("nub",       "Print nub climbers",   @Console);
-  CClientCommand@ g_pCp       = CClientCommand("cp",        "Save a checkpoint",    @Console);
-  CClientCommand@ g_pTp       = CClientCommand("tp",        "Load a checkpoint",    @Console);
-  CClientCommand@ g_pObserver = CClientCommand("observer",  "Toggle observer mode", @Console);
-  CClientCommand@ g_pMenu     = CClientCommand("menu",      "Toggle menu",          @Console);
-  CClientCommand@ g_pWeapon   = CClientCommand("weapon",    "Give weapon",          @Console);
+  CClientCommand@ g_pStartTimer   = CClientCommand("start_timer",   "Start timer",  @AdminConsole);
+  CClientCommand@ g_pStopTimer    = CClientCommand("stop_timer",    "Stop timer",   @AdminConsole);
+  CClientCommand@ g_pCancelTimer  = CClientCommand("cancel_timer",  "Cancel timer", @AdminConsole);
+  CClientCommand@ g_pCreateStart  = CClientCommand("create_start",  "Create start", @AdminConsole);
+  CClientCommand@ g_pRemoveStart  = CClientCommand("remove_start",  "Remove start", @AdminConsole);
+  CClientCommand@ g_pCreateStop   = CClientCommand("create_stop",   "Create stop",  @AdminConsole);
+  CClientCommand@ g_pRemoveStop   = CClientCommand("remove_stop",   "Remove stop",  @AdminConsole);
+  CClientCommand@ g_pSaveButtons  = CClientCommand("save_buttons",  "Save buttons", @AdminConsole);
+
+  CClientCommand@ g_pMenu       = CClientCommand("menu",      "Toggle menu",          @Console);
+  CClientCommand@ g_pCp         = CClientCommand("cp",        "Save a checkpoint",    @Console);
+  CClientCommand@ g_pTp         = CClientCommand("tp",        "Load a checkpoint",    @Console);
+  CClientCommand@ g_pPro        = CClientCommand("pro",       "Print pro climbers",   @Console);
+  CClientCommand@ g_pNub        = CClientCommand("nub",       "Print nub climbers",   @Console);
+  CClientCommand@ g_pRewpawn    = CClientCommand("respawn",   "Respawn",              @Console);
+  CClientCommand@ g_pStart      = CClientCommand("start",     "Respawn",              @Console);
+  CClientCommand@ g_pObserver   = CClientCommand("observer",  "Toggle observer mode", @Console);
+  CClientCommand@ g_pObserve    = CClientCommand("observe",   "Toggle observer mode", @Console);
+  CClientCommand@ g_pOSpectate  = CClientCommand("spectate",  "Toggle observer mode", @Console);
+  CClientCommand@ g_pSpectator  = CClientCommand("spectator", "Toggle observer mode", @Console);
+  CClientCommand@ g_pSpec       = CClientCommand("spec",      "Toggle observer mode", @Console);
+  CClientCommand@ g_pObs        = CClientCommand("obs",       "Toggle observer mode", @Console);
+  CClientCommand@ g_pWeapon     = CClientCommand("weapon",    "Give weapon",          @Console);
 
   array<string> g_CommandPrefixes = {".", "/", "!"};
 
@@ -63,7 +83,6 @@ namespace SKZCommand
       if (commands.find(szCommand) == -1)
         continue;
 
-      bool bAdmin = g_PlayerFuncs.AdminLevel(@pPlayer) >= ADMIN_YES;
       SKZClient::Client@ pClient = SKZClient::GetClient(@pPlayer);
 
       switch (uiKey)
@@ -101,6 +120,21 @@ namespace SKZCommand
         case CMD_WEAPON:
           pClient.GiveWeapon();
           break;
+        case CMD_CREATE_START:
+          SKZEntity::CreateButton(@pClient.Player, SKZEntity::TIMER_START);
+          break;
+        case CMD_REMOVE_START:
+          SKZEntity::RemoveButton(SKZEntity::TIMER_START);
+          break;
+        case CMD_CREATE_STOP:
+          SKZEntity::CreateButton(@pClient.Player, SKZEntity::TIMER_STOP);
+          break;
+        case CMD_REMOVE_STOP:
+          SKZEntity::RemoveButton(SKZEntity::TIMER_STOP);
+          break;
+        case CMD_SAVE_BUTTONS:
+          SKZEntity::SaveButtons();
+          break;
       }
 
       return true;
@@ -114,12 +148,34 @@ namespace SKZCommand
     CBasePlayer@ pPlayer = g_ConCommandSystem.GetCurrentPlayer();
 
     if (pArguments.ArgC() == 1)
-      Execute(pPlayer, pArguments[0]);
+      Execute(@pPlayer, pArguments[0]);
+  }
+
+  void AdminConsole(const CCommand@ pArguments)
+  {
+    CBasePlayer@ pPlayer = g_ConCommandSystem.GetCurrentPlayer();
+
+    bool bAdmin = g_PlayerFuncs.AdminLevel(@pPlayer) >= ADMIN_YES;
+    if (!bAdmin)
+    {
+      SKZPrint::Notify(@pPlayer, "You need to be an admin to use this command.");
+      return;
+    }
+
+    if (pArguments.ArgC() == 1)
+      Execute(@pPlayer, pArguments[0]);
   }
 
   void LadderBoost(const CCommand@ pArguments)
   {
     CBasePlayer@ pPlayer = g_ConCommandSystem.GetCurrentPlayer();
+
+    bool bAdmin = g_PlayerFuncs.AdminLevel(@pPlayer) >= ADMIN_YES;
+    if (!bAdmin)
+    {
+      SKZPrint::Notify(@pPlayer, "You need to be an admin to use this command.");
+      return;
+    }
 
     if (pArguments.ArgC() > 1)
     {

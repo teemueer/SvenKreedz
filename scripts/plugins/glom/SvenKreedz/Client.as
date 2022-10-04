@@ -45,14 +45,24 @@ namespace SKZClient
 
     string Name
     {
-      get const { return this.Player.pev.netname; }
+      get const {
+        CBasePlayer@ pPlayer = @this.Player;
+        if (pPlayer is null)
+          return "";
+
+        return this.Player.pev.netname;
+      }
     }
 
     string SteamId
     {
       get const
       {
-        const string szSteamId = g_EngineFuncs.GetPlayerAuthId(this.Player.edict());
+        CBasePlayer@ pPlayer = @this.Player;
+        if (pPlayer is null)
+          return "";
+
+        const string szSteamId = g_EngineFuncs.GetPlayerAuthId(pPlayer.edict());
         return szSteamId == "BOT" ? this.Name : szSteamId;
       }
     }
@@ -75,7 +85,13 @@ namespace SKZClient
 
     bool IsBot
     {
-      get const { return this.Player.pev.flags & FL_FAKECLIENT != 0; }
+      get const {
+        CBasePlayer@ pPlayer = @this.Player;
+        if (pPlayer is null)
+          return false;
+
+        return pPlayer.pev.flags & FL_FAKECLIENT != 0;
+      }
     }
     
     SKZStopwatch::Stopwatch@ Stopwatch
@@ -136,8 +152,12 @@ namespace SKZClient
     {
       if (DEBUG) g_Game.AlertMessage(at_console, "[%1] CreateSemiclip()\n", this.Name);
 
-      @this.Semiclip = g_EntityFuncs.Create("trigger_semiclip", this.Player.pev.origin, g_vecZero, true);
-      @this.Semiclip.pev.owner = @Player.edict();
+      CBasePlayer@ pPlayer = @this.Player;
+      if (pPlayer is null)
+        return;
+
+      @this.Semiclip = g_EntityFuncs.Create("trigger_semiclip", pPlayer.pev.origin, g_vecZero, true);
+      @this.Semiclip.pev.owner = @pPlayer.edict();
       g_EntityFuncs.DispatchSpawn(@this.Semiclip.edict());
     }
 
@@ -153,24 +173,32 @@ namespace SKZClient
     {
       if (DEBUG) g_Game.AlertMessage(at_console, "[%1] ToggleSemiclip\n", this.Name);
 
+      CBasePlayer@ pPlayer = @this.Player;
+      if (pPlayer is null)
+        return;
+
       this.IsSemiclipped
-        ? this.Player.pev.groupinfo = 0
-        : this.Player.pev.groupinfo = 1 << (this.Player.entindex() & 31);
+        ? pPlayer.pev.groupinfo = 0
+        : pPlayer.pev.groupinfo = 1 << (pPlayer.entindex() & 31);
 
       m_bSemiclip = !m_bSemiclip;
     }
 
     void Start()
     {
-      //if (DEBUG) g_Game.AlertMessage(at_console, "[%1] Start()\n", this.Name);
+      if (DEBUG) g_Game.AlertMessage(at_console, "[%1] Start()\n", this.Name);
+
+      CBasePlayer@ pPlayer = @this.Player;
+      if (pPlayer is null)
+        return;
 
       m_uiStartTime = SKZTime::Now();
       m_uiCp = 0;
       m_uiTp = 0;
 
-      this.Player.pev.iuser4 = 0;
+      pPlayer.pev.iuser4 = 0;
 
-      this.Stopwatch.Start(@this.Player, m_uiStartTime);
+      this.Stopwatch.Start(@pPlayer, m_uiStartTime);
     }
 
     void Stop()
@@ -183,10 +211,14 @@ namespace SKZClient
       uint uiStopTime = SKZTime::Now();
       uint uiTime = uiStopTime - m_uiStartTime;
 
-      this.Stopwatch.Stop(@this.Player, uiTime);
+      CBasePlayer@ pPlayer = @this.Player;
+      if (pPlayer is null)
+        return;
 
       @this.Record = SKZRecord::Record(this.Name, this.SteamId, uiTime, m_uiCp, m_uiTp);
-      SKZRecord::UpdateRecords(@this.Record);
+      const bool bNewRecord = SKZRecord::UpdateRecords(@this.Record);
+
+      this.Stopwatch.Stop(@pPlayer, uiTime, bNewRecord);
     }
 
     void Cancel()
@@ -194,11 +226,15 @@ namespace SKZClient
       if (!this.Stopwatch.Started)
         return;
 
+      CBasePlayer@ pPlayer = @this.Player;
+      if (pPlayer is null)
+        return;
+
       if (DEBUG) g_Game.AlertMessage(at_console, "[%1] Cancel()\n", this.Name);
 
       uint uiStopTime = SKZTime::Now();
 
-      this.Stopwatch.Cancel(@this.Player, uiStopTime - m_uiStartTime);
+      this.Stopwatch.Cancel(@pPlayer, uiStopTime - m_uiStartTime);
     }
 
     void Respawn(const bool bIsBot = false)
@@ -206,17 +242,26 @@ namespace SKZClient
       if (DEBUG) g_Game.AlertMessage(at_console, "[%1] Respawn()\n", this.Name);
 
       this.Cancel();
-      g_PlayerFuncs.RespawnPlayer(@this.Player, true, true);
+
+      CBasePlayer@ pPlayer = @this.Player;
+      if (pPlayer is null)
+        return;
+
+      g_PlayerFuncs.RespawnPlayer(@pPlayer, true, true);
 
       if (bIsBot)
-        this.Player.pev.origin = Vector(99999, 99999, 99999);
+        pPlayer.pev.origin = Vector(99999, 99999, 99999);
     }
 
     void Save()
     {
       if (DEBUG) g_Game.AlertMessage(at_console, "[%1] Save()\n", this.Name);
 
-      if (this.Checkpoint.Save(@this.Player, m_uiStartTime))
+      CBasePlayer@ pPlayer = @this.Player;
+      if (pPlayer is null)
+        return;
+
+      if (this.Checkpoint.Save(@pPlayer, m_uiStartTime))
         m_uiCp++;
     }
 
@@ -224,12 +269,16 @@ namespace SKZClient
     {
       if (DEBUG) g_Game.AlertMessage(at_console, "[%1] Load()\n", this.Name);
 
-      if (this.Checkpoint.Load(@this.Player) && this.Stopwatch.Started)
+      CBasePlayer@ pPlayer = @this.Player;
+      if (pPlayer is null)
+        return;
+
+      if (this.Checkpoint.Load(@pPlayer) && this.Stopwatch.Started)
       {
         if (m_uiCp == 0)
           this.Cancel();
         else if (m_uiTp++ == 0)
-          this.Stopwatch.SetNubRun(@this.Player, this.Time);
+          this.Stopwatch.SetNubRun(@pPlayer, this.Time);
       }
     }
 
@@ -237,12 +286,16 @@ namespace SKZClient
     {
       if (DEBUG) g_Game.AlertMessage(at_console, "[%1] ToggleObserver()\n", this.Name);
 
-      Observer@ pObserver = this.Player.GetObserver();
+      CBasePlayer@ pPlayer = @this.Player;
+      if (pPlayer is null)
+        return;
+
+      Observer@ pObserver = pPlayer.GetObserver();
 
       if (pObserver.IsObserver())
       {
         SKZPrint::Notify("%1 exited observer mode", this.Name);
-        g_PlayerFuncs.RespawnPlayer(@this.Player, true, true);
+        g_PlayerFuncs.RespawnPlayer(@pPlayer, true, true);
         this.RemoveTarget();
       }
       else
@@ -250,7 +303,7 @@ namespace SKZClient
         SKZPrint::Notify("%1 entered observer mode", this.Name);
         this.Cancel();
 
-        pObserver.StartObserver(this.Player.pev.origin, this.Player.pev.v_angle, true);
+        pObserver.StartObserver(pPlayer.pev.origin, pPlayer.pev.v_angle, true);
         if (pObserver.HasCorpse())
           pObserver.RemoveDeadBody();
 
@@ -263,47 +316,70 @@ namespace SKZClient
 
     void DelayRespawn()
     {
-      this.Player.m_flRespawnDelayTime = 10000 - g_EngineFuncs.CVarGetFloat("mp_respawndelay");
+      CBasePlayer@ pPlayer = @this.Player;
+      if (pPlayer is null)
+        return;
+
+      pPlayer.m_flRespawnDelayTime = 10000 - g_EngineFuncs.CVarGetFloat("mp_respawndelay");
     }
 
     void SetTarget(Client@ pTarget)
     {
       if (DEBUG) g_Game.AlertMessage(at_console, "[%1] SetTarget()\n", this.Name);
 
+      CBasePlayer@ pPlayer = @this.Player;
+      if (pPlayer is null)
+        return;
+
       @this.TargetStopwatch = SKZStopwatch::Stopwatch(@pTarget.Stopwatch);
-      this.TargetStopwatch.Show(@this.Player, pTarget.Time);
+      this.TargetStopwatch.Show(@pPlayer, pTarget.Time);
     }
 
     void RemoveTarget()
     {
       if (DEBUG) g_Game.AlertMessage(at_console, "[%1] RemoveTarget()\n", this.Name);
 
+      CBasePlayer@ pPlayer = @this.Player;
+      if (pPlayer is null)
+        return;
+
       @this.TargetStopwatch = null;
 
-      this.Stopwatch.Show(@this.Player, this.Time);
+      this.Stopwatch.Show(@pPlayer, this.Time);
     }
 
     void ToggleMenu()
     {
-      m_pMenu.Open(@this.Player);
+      CBasePlayer@ pPlayer = @this.Player;
+      if (pPlayer is null)
+        return;
+
+      m_pMenu.Open(@pPlayer);
     }
 
     void GiveWeapon()
     {
-      if (!this.Player.IsAlive())
+      CBasePlayer@ pPlayer = @this.Player;
+      if (pPlayer is null)
+        return;
+
+      if (!pPlayer.IsAlive())
       {
-        SKZPrint::Notify(@this.Player, "Can't give weapon while dead.");
+        SKZPrint::Notify(@pPlayer, "Can't give weapon while dead.");
         return;
       }
 
-      this.Player.SetMaxAmmo("357", 9999);
-      this.Player.GiveNamedItem("weapon_eagle");
-      this.Player.GiveAmmo(9999, "357", 9999);
+      pPlayer.SetMaxAmmo("357", 9999);
+      pPlayer.GiveNamedItem("weapon_eagle");
+      pPlayer.GiveAmmo(9999, "357", 9999);
     }
   }
 
   Client@ GetClient(CBasePlayer@ pPlayer)
   {
+    if (pPlayer is null)
+      return null;
+
     const uint uiIndex = pPlayer.entindex();
     Client@ pClient = g_Clients[uiIndex];
 

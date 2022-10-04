@@ -216,6 +216,9 @@ namespace SKZRecord
 
   void PrintRecords(CBasePlayer@ pPlayer, RECORD recordType)
   {
+    if (pPlayer is null)
+      return;
+
     const array<Record@>@ records = cast<array<Record@>@>(g_Records[recordType]);
 
     if (records.length() == 0)

@@ -76,11 +76,11 @@ namespace SKZStopwatch
       SKZPrint::Notify(@pPlayer, "Timer started");
     }
 
-    void Stop(CBasePlayer@ pPlayer, const uint uiTime)
+    void Stop(CBasePlayer@ pPlayer, const uint uiTime, const bool bNewRecord)
     {
       m_Params.flags |= HUD_TIME_FREEZE;
       m_Params.value = uiTime / 1000.0;
-      m_Params.color1 = RGBA_RECORD;
+      m_Params.color1 = bNewRecord ? RGBA_RECORD : RGBA_NO_RECORD;
 
       g_PlayerFuncs.HudTimeDisplay(@pPlayer, m_Params);
       SKZPrint::Notify(@pPlayer, "Timer stopped");

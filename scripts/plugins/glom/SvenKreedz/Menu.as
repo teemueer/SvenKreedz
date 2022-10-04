@@ -35,7 +35,7 @@ namespace SKZMenu
       this.Menu.AddItem("Observe",          any(MENU_OBSERVE));
       this.Menu.AddItem("Pro climbers",     any(MENU_PRO));
       this.Menu.AddItem("Nub climbers",     any(MENU_NUB));
-      this.Menu.AddItem("Map info",         any(MENU_INFO));
+      //this.Menu.AddItem("Map info",         any(MENU_INFO));
 
       this.Menu.Register();
     }

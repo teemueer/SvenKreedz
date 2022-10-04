@@ -132,7 +132,7 @@ namespace SKZEntity
     {
       CBaseEntity@ pButton = g_Buttons[i];
       string szLine;
-      snprintf(szLine, "%1\t%2\t3\n",
+      snprintf(szLine, "%1\t%2\t%3",
         int(pButton.pev.iuser4),
         pButton.pev.origin.ToString(),
         pButton.pev.angles.ToString());
@@ -143,6 +143,8 @@ namespace SKZEntity
 
   void LoadButtons()
   {
+    g_Buttons.resize(0);
+    
     g_CustomEntityFuncs.RegisterCustomEntity("FuncTimer", "func_timer");
 
     array<string> lines = SKZFile::ReadLines(SKZConfig::szButtons + g_Engine.mapname);

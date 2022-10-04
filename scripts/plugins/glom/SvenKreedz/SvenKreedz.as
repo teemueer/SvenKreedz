@@ -1,7 +1,6 @@
-const bool DEBUG = true;
+const bool DEBUG = false;
 
 const string PLUGIN_NAME    = "SVEN-KREEDZ";
-const string PLUGIN_TAG     = "SKZ";
 const string PLUGIN_VERSION = "1.0.0";
 const string PLUGIN_AUTHOR  = "GLOM";
 const string PLUGIN_CONTACT = "https://glom.iki.fi/kz";
@@ -63,14 +62,14 @@ void MapInit()
   SKZClient::g_Clients.resize(0);
   SKZClient::g_Clients.resize(g_Engine.maxClients + 1);
 
-  SKZRecord::LoadRecords();
-  SKZPoint::LoadPoints();
-
   g_CustomEntityFuncs.RegisterCustomEntity("TriggerSemiclip", "trigger_semiclip");
 
   g_SoundSystem.PrecacheSound("vox/woop.wav");
   g_Game.PrecacheModel("models/glom/kz/start.mdl");
   g_Game.PrecacheModel("models/glom/kz/stop.mdl");
+
+  g_SurvivalMode.EnableMapSupport();
+  g_SurvivalMode.SetDelayBeforeStart(0);
 }
 
 void MapActivate()
@@ -82,6 +81,9 @@ void MapActivate()
 
   if (!SKZEntity::CreateTimers())
     SKZEntity::LoadButtons();
+
+  SKZRecord::LoadRecords();
+  SKZPoint::LoadPoints();
 
   SKZEntity::FixSpawns();
 

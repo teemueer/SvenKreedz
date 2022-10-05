@@ -24,6 +24,7 @@ namespace PlayerHooks
   {
     SKZClient::Client@ pClient = SKZClient::GetClient(pPlayer);
     pClient.Cancel();
+    pClient.RemoveSemiclip();
 
     if (pAttacker is pPlayer)
       pPlayer.pev.frags += 1;

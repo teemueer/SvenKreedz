@@ -33,6 +33,7 @@ namespace SKZCommand
     {CMD_REMOVE_START,  array<string> = {"remove_start"}},
     {CMD_CREATE_STOP,   array<string> = {"create_stop"}},
     {CMD_REMOVE_STOP,   array<string> = {"remove_stop"}},
+    {CMD_SAVE_BUTTONS,  array<string> = {"save_buttons"}},
     {CMD_START,         array<string> = {"start_timer"}},
     {CMD_STOP,          array<string> = {"stop_timer"}}
   };

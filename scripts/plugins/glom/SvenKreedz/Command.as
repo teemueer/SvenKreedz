@@ -93,16 +93,16 @@ namespace SKZCommand
       switch (uiKey)
       {
         case CMD_START:
-          //if (bAdmin)
-          //  pClient.Start();
+          if (bAdmin)
+            pClient.Start();
           break;
         case CMD_STOP:
-          //if (bAdmin)
-          //  pClient.Stop();
+          if (bAdmin)
+            pClient.Stop();
           break;
         case CMD_CANCEL:
-          //if (bAdmin)
-          //  pClient.Cancel();
+          if (bAdmin)
+            pClient.Cancel();
           break;
         case CMD_RESPAWN:
           pClient.Respawn();

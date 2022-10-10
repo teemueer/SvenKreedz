@@ -263,6 +263,8 @@ namespace SKZClient
 
       if (this.Checkpoint.Save(@pPlayer, m_uiStartTime))
         m_uiCp++;
+
+      g_Game.AlertMessage(at_console, "[%1] cp: %2 tp: %3\n", this.Name, m_uiCp, m_uiTp);
     }
 
     void Load()

@@ -62,8 +62,8 @@ namespace SKZRecord
       m_szName = szName;
       m_szSteamId = szSteamId;
       m_uiTime = uiTime;
-      m_uiTp = uiCp;
-      m_uiCp = uiTp;
+      m_uiCp = uiCp;
+      m_uiTp = uiTp;
       m_uiDate = uiDate;
     }
 

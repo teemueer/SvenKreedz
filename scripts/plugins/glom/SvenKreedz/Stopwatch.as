@@ -113,7 +113,9 @@ namespace SKZStopwatch
 
     bool opEquals(Stopwatch@ pStopwatch)
     {
-      return this.StartTime == pStopwatch.StartTime && this.Params.flags == pStopwatch.Params.flags;
+      return this.StartTime == pStopwatch.StartTime
+        && this.Params.flags == pStopwatch.Params.flags
+        && SKZMisc::ColorsMatch(this.Params.color1, pStopwatch.Params.color1);
     }
   }
 

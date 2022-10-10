@@ -167,6 +167,12 @@ namespace SKZClient
       
       if (m_hSemiclip.IsValid())
 			  g_EntityFuncs.Remove(this.Semiclip);
+
+      CBasePlayer@ pPlayer = @this.Player;
+      if (pPlayer is null)
+        return;
+
+      pPlayer.pev.groupinfo = 0;
     }
 
     void ToggleSemiclip()

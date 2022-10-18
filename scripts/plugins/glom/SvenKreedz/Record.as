@@ -104,7 +104,7 @@ namespace SKZRecord
     {
       return this.IsPro
         ? array<string> = {this.Name, this.SteamId, SKZTime::HMS(this.Time), SKZTime::YMD(this.Date)}
-        : array<string> = {this.Name, this.SteamId, SKZTime::HMS(this.Time), string(this.Cp), string(this.Cp), SKZTime::YMD(this.Date)};
+        : array<string> = {this.Name, this.SteamId, SKZTime::HMS(this.Time), string(this.Cp), string(this.Tp), SKZTime::YMD(this.Date)};
     }
   }
 
